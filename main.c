@@ -6,6 +6,7 @@
 #define WIDTH 800
 #define HEIGHT 600
 #define COLOR_WHITE 0xffffffff
+#define COLOR_BLACK 0x00000000
 
 struct Circle
 {
@@ -37,13 +38,29 @@ int main()
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = SDL_CreateWindow("Ray Tracing in C", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
     SDL_Surface *surface = SDL_GetWindowSurface(window);
-
-    // SDL_Rect rect = (SDL_Rect){200, 200, 200, 200};
-    // SDL_FillRect(surface, &rect, COLOR_WHITE);
+    SDL_Rect erase_rect = (SDL_Rect){0, 0, WIDTH, HEIGHT};
 
     struct Circle circle = {200, 200, 80};
-    FillCircle(surface, circle, COLOR_WHITE);
 
-    SDL_UpdateWindowSurface(window);
-    SDL_Delay(5000);
+    int running = 1;
+    SDL_Event event;
+    while (running)
+    {
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                running = 0;
+            }
+            if (event.type == SDL_MOUSEMOTION && event.motion.state != 0)
+            {
+                circle.x = event.motion.x;
+                circle.y = event.motion.y;
+            }
+        }
+        SDL_FillRect(surface, &erase_rect, COLOR_BLACK);
+        FillCircle(surface, circle, COLOR_WHITE);
+        SDL_UpdateWindowSurface(window);
+        SDL_Delay(10);
+    }
 }
